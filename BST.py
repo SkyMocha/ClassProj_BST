@@ -28,10 +28,12 @@ class Node ():
     # Sets the left node
     def set_left (self, node):
         self.left = node
+        return self
 
     # Sets the right node
     def set_right (self, node):
         self.right = node
+        return self
 
     # def visit (self, left=True):
     #     print (self)
@@ -47,9 +49,11 @@ class Node ():
         return self.right == None or self.right.traversed
 
 class BST ():
-    def __init__(self, params):
+    def __init__(self, params=-1):
+        self.root = None
         if (type(params) == int):
-            self.root = Node(params)
+            if (params != -1):
+                self.root = Node(params)
         if (type(params) == list):
             self.root = Node (params[0])
             for i in params:
@@ -57,21 +61,26 @@ class BST ():
     
     # Adds a node to the tree
     def add (self, num, node=-1):
-        if (node == -1):
+        if (self.root != None and node == -1):
             node = self.root
+        elif (self.root == None):
+            self.root = Node(num)
+            return
+
+        # print (f"{num}    {node.val}")
         if (num < node.val): # Checks to see if the number entered is lesser than the current nodes value
             # Checks to see if there is a left node to jump to, otherwise set the node's left value to a new node
             if (node.left != None):
-                self.add(num, node.left)
+                return self.add(num, node.left)
             else:
-                node.set_left(Node(num, node))
+                return node.set_left(Node(num, node))
 
         elif (num > node.val): # Checks to see if the number entered is greater than the current nodes value
             if (node.right != None):
-                self.add(num, node.right)
+                return self.add(num, node.right)
             else:
-                node.set_right(Node(num, node))
-
+                return node.set_right(Node(num, node))
+        
     def someOrder (self, node=-1, l=[]):
         if (node == -1):
             node = self.root
@@ -79,16 +88,16 @@ class BST ():
             return l
         # Checks to see if the left node is not empty and has not been traversed
         if (node.left != None and not node.left.traversed):
-            return self.traverse( node.left, l )
+            return self.someOrder( node.left, l )
         # If the left node has been added, then traverse the right if not empty
         elif (node.right != None and not node.right.traversed):
-            return self.traverse ( node.right, l )
+            return self.someOrder ( node.right, l )
         # If there is no left node, add the current node and traverse the parent
         else:
             l.append(str(node))
             node.traversed = True
             print (node.val)
-            return self.traverse( node.parent, l )
+            return self.someOrder( node.parent, l )
 
     # In order traversal of the binary search tree
     def traverse (self, node=-1):
